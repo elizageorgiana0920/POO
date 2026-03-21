@@ -1,0 +1,16 @@
+15
+Espresso_Scurt 5.0 30 2 Cafea_Arabica Apa_Plata
+Cappuccino_Clasic 7.0 120 4 Cafea_Robusta Apa_Plata Lapte_Vaca Scortisoara
+Caffe_Latte 8.0 150 3 Cafea_Arabica Apa_Plata Lapte_Vaca
+Flat_White 9.0 130 2 Cafea_Arabica Lapte_Vaca
+Matcha_Latte_Vegan 12.0 180 4 Matcha_Pudra Apa_Plata Lapte_Migdale Stevia
+Oat_Vanilla_Latte 10.0 160 3 Cafea_Arabica Lapte_Ovaz Sirop_Vanilie
+Ceai_Verde_Bio 6.0 240 3 Ceai_Verde_Frunze Apa_Plata Miere_Bio
+Cortado_Migdale 7.5 90 2 Cafea_Robusta Lapte_Migdale
+Choco_White_Snow 11.0 200 4 Ciocolata_Alba_Lichida Lapte_Vaca Frisca_Lichida Mini_Marshmallows
+Caramel_Macchiato 10.5 170 4 Cafea_Arabica Lapte_Vaca Sirop_Caramel_Sarat Zahar_Brun
+Mocha_Fistic 12.5 210 4 Ciocolata_Neagra_Pudra Cafea_Robusta Lapte_Vaca Sirop_Fistic
+Hot_Choco_Cardamom 10.0 190 4 Ciocolata_Neagra_Pudra Lapte_Vaca Pudra_Cardamom Zahar_Alb
+London_Fog 9.5 300 4 Ceai_Negru_Earle_Grey Apa_Plata Lapte_Vaca Sirop_Vanilie
+Ceai_Fructe_Iarna 7.0 300 4 Ceai_Fructe_Padure Apa_Plata Scortisoara Miere_Bio
+Americano 5.0 60 2 Cafea_Arabica Apa_Plata
