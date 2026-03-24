@@ -72,7 +72,7 @@ public:
     void setNume(const char* numeNou)///sett-er
     {
         if (numeNou){
-            delete[] nume; // Eliberăm ce era înainte
+            delete[] nume;
             nume = new char[strlen(numeNou) + 1];
             strcpy(nume, numeNou);
         }
@@ -172,6 +172,9 @@ public:
             strcpy(numeBautura, numeBauturaNou);
         }
     }
+    void setTimpPreparare(int timpPreparareNou){ timpPreparare=timpPreparareNou; }
+    void setPretPreparare(float pretPreparareNou) {pretPreparare=pretPreparareNou;}
+    void setNrIngrediente(int nrIngredienteNou) {nrIngrediente=nrIngredienteNou;}
     inline float calculeazaPret() const{return pretPreparare+calculPretIngrediente();} ///calculeaza pretul total al unei bauturi, cu tot cu pretul ingredientelor si a costului de preparare
     inline bool verificaVegan() const///verifica daca bautura este vegana=>true else false
     {  for(int i=0; i<nrIngrediente; i++){
