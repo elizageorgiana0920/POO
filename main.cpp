@@ -1,396 +1,680 @@
 #include<iostream>
 #include<fstream>
 #include<cstring>
-
-
-class Ingredient {
+void antet();
+class Ingredient
+{
 private:
-    char* nume;
-    int stoc;
-    float pret;
-    bool vegan;
-    bool faraZahar;
-    float kcal;
-
+    char* nume;///nume ingredient
+    int stoc;///stoc disponibil
+    float pret;///pretul cu care a fost cumparat ingredientul
+    bool vegan;///vegan=1=>ingredient vegan, vegan=0=>ingredient non-vegan
+    bool faraZahar;///faraZahar=1=>ingredient fara zahar, faraZahar=0=>ingredient cu zahar
+    float kcal;///numarul de kilocalorii pe care il are ingredientul
 public:
     ///Constructor implicit
     Ingredient():nume(nullptr), stoc(0), pret(0.0f), vegan(false), faraZahar(false), kcal(0.0f) {}
-
     ///Constructor de initializare
-    Ingredient(const char* nume_, int stoc_, float pret_, bool vegan_, bool faraZahar_, float kcal_)
-    :stoc{stoc_}, pret{pret_}, vegan{vegan_}, faraZahar{faraZahar_}, kcal{kcal_} {
-        if (nume_) {
+    Ingredient(const char* nume_, int stoc_, float pret_, bool vegan_, bool faraZahar_, float kcal_) :stoc{stoc_}, pret{pret_}, vegan{vegan_}, faraZahar{faraZahar_}, kcal{kcal_}{
+        if (nume_){
             nume=new char[std::strlen(nume_)+1];
             std::strcpy(nume, nume_);
         }
-        else
-            nume=nullptr;
-
+        else nume=nullptr;
     }
-
     ///Constructor cu un singur parametru
-    explicit Ingredient (const char *nume_): stoc(0), pret(0.0f), vegan(false), faraZahar(false), kcal(0.0f) {
-        if (nume_) {
+    explicit Ingredient (const char *nume_): stoc(0), pret(0.0f), vegan(false), faraZahar(false), kcal(0.0f){
+        if (nume_){
             nume=new char[std::strlen(nume_)+1];
             std::strcpy(nume, nume_);
         }
-        else
-            nume=nullptr;
+        else nume=nullptr;
     }
-
     ///Constructor de copiere (CC)
-    Ingredient(const Ingredient& other):stoc(other.stoc), pret(other.pret), vegan(other.vegan), faraZahar(other.faraZahar), kcal(other.kcal) {
-        if (other.nume) {
+    Ingredient(const Ingredient& other):stoc(other.stoc), pret(other.pret), vegan(other.vegan), faraZahar(other.faraZahar), kcal(other.kcal){
+        if (other.nume){
             nume=new char[std::strlen(other.nume)+1];
             std::strcpy(nume, other.nume);
         }
-        else
-            nume=nullptr;
+        else nume=nullptr;
     }
-
     ///Operator de copiere (op=)
-    Ingredient& operator=(const Ingredient& other) {
+    Ingredient& operator=(const Ingredient& other){
         ///eliberez memoria
-        if (this!=&other) {
+        if (this!=&other){
             delete[] nume;
-
             ///copiez datele vechi
             stoc=other.stoc;
             pret=other.pret;
             vegan=other.vegan;
             faraZahar=other.faraZahar;
             kcal=other.kcal;
-
             ///aloc spatiu si copiez noul nume
-            if (other.nume) {
+            if (other.nume){
                 nume=new char[std::strlen(other.nume)+1];
                 std::strcpy(nume, other.nume);
             }
-            else
-                nume=nullptr;
+            else nume=nullptr;
         }
         return *this;
-
     }
-
     ///Destructor
-    ~Ingredient() {
-        delete[] nume;
-    }
-
-    void cresterePret() {
-        if (stoc>0 && stoc<500) {
-            pret+=pret*12/100;
-        }
-    }
-
-    void reaprovizionare(int stocAdaugat) {
-        stoc+=stocAdaugat;
-    }
-
+    ~Ingredient(){delete[] nume;}
+    inline void reaprovizionare(int stocAdaugat){stoc+=stocAdaugat;}///la apelarea functiei se mareste stocul
+    inline void consumaStoc(){stoc--;}///folosita dupa prepararea unei bauturi pentru scaderea stocului ingredientelor folosite
     //Getteri
-    const char* getNume() const
+    const char* getNume() const { return nume;}
+    int getStoc() const {return stoc;}
+    float getPret() const {return pret;}
+    bool getVegan() const{return vegan;}
+    bool getFaraZahar() const{return faraZahar;}
+    float getKcal() const{return kcal;}
+    void setNume(const char* numeNou)///sett-er
     {
-        return nume;
-    }
-    int getStoc() const
-    {
-        return stoc;
-    }
-    float getPret() const
-    {
-        return pret;
-    }
-    bool getVegan() const
-    {
-        return vegan;
-    }
-    bool getFaraZahar() const
-    {
-        return faraZahar;
-    }
-    float getKcal() const
-    {
-        return kcal;
-    }
-
-    void setNume(const char* numeNou) {
-        if (numeNou) {
-            delete[] nume;
-            nume=new char[strlen(numeNou)+1];
+        if (numeNou){
+            delete[] nume; // Eliberăm ce era înainte
+            nume = new char[strlen(numeNou) + 1];
             strcpy(nume, numeNou);
         }
     }
     ///Friend pentru operatori
-    friend std::istream& operator>>(std::istream& is, Ingredient& ing) {
+    friend std::istream& operator>>(std::istream& is, Ingredient& ing){
         char copie[300];
         if (is>>copie>>ing.stoc>>ing.pret>>ing.vegan>>ing.faraZahar>>ing.kcal){
-        delete[] ing.nume;
-        ing.nume=new char[std::strlen(copie)+1];
-        std::strcpy(ing.nume, copie);
-    }
+            delete[] ing.nume;
+            ing.nume=new char[std::strlen(copie)+1];
+            std::strcpy(ing.nume, copie);
+        }
         return is;
     }
-
-    friend std::ostream& operator<<(std::ostream& os, const Ingredient& ing) {
-        os<<"Nume: " << ing.nume <<", stoc: " <<ing.stoc <<", pret: "<<ing.pret<<", vegan: "<<ing.vegan<<", fara zahar :"<<ing.faraZahar<<", kcal:"<<ing.kcal<<"\n";
+    friend std::ostream& operator<<(std::ostream& os, const Ingredient& ing){
+        os<<"nume: " << ing.nume <<", stoc: " <<ing.stoc <<", pret: "<<ing.pret<<", vegan: "<<ing.vegan<<", fara zahar: "<<ing.faraZahar<<", kcal:"<<ing.kcal<<"\n";
         return os;
     }
 };
 
-class Bautura {
-    char *numeBautura;
-    float pretPreparare;
-    int timpPreparare;
-    Ingredient* listaIngrediente;
-    int nrIngrediente;
-
-public:
-    ///Constructor Implicit
-    Bautura():numeBautura(nullptr), pretPreparare(0.0f), timpPreparare(0), listaIngrediente(nullptr), nrIngrediente(0) {}
-
-    ///Constructor de initializare
-    Bautura(const char* numeBautura_, float pretPreparare_, int timpPreparare_): pretPreparare{pretPreparare_}, timpPreparare{timpPreparare_}, listaIngrediente(nullptr), nrIngrediente(0)
+class Bautura{
+    char *numeBautura;///numele bauturii
+    float pretPreparare;///costul prepararii bauturii de catre barista
+    int timpPreparare;///timpul necesar prepararii bauturii
+    Ingredient* listaIngrediente;///lista de ingrediente necesara fiecarui preparat este salvata cu ajutorul pointerilor spre tipul Ingredient pentru a retine si proprietatile din clasa Ingredient, nu doar numele
+    int nrIngrediente;///numarul de ingrediente pentru fiecare bautura
+    inline float calculPretIngrediente() const///aici calculez pretul bauturii, dar fara costul de preparare, strict suma ingredientelor
     {
-        if (numeBautura_)
-        {
+        float total=0;
+        for(int i=0; i<nrIngrediente; i++)
+            total+=listaIngrediente[i].getPret();
+         return total;
+    }
+public:
+    ///Constructor implicit
+    Bautura():numeBautura(nullptr), pretPreparare(0.0f), timpPreparare(0), listaIngrediente(nullptr), nrIngrediente(0) {}
+    ///Constructor de initializare
+    Bautura(const char* numeBautura_, float pretPreparare_, int timpPreparare_): pretPreparare{pretPreparare_}, timpPreparare{timpPreparare_}{
+        if (numeBautura_){
             numeBautura = new char[std::strlen(numeBautura_) + 1];
             std::strcpy(numeBautura, numeBautura_);
         }
         else numeBautura = nullptr;
     }
-
     ///Constructor de copiere(CC)
-    Bautura(const Bautura& other)
-        :pretPreparare(other.pretPreparare), timpPreparare(other.timpPreparare), nrIngrediente(other.nrIngrediente)
-    {
-        if (other.numeBautura)
-        {
+    Bautura(const Bautura& other):pretPreparare(other.pretPreparare), timpPreparare(other.timpPreparare), nrIngrediente(other.nrIngrediente){
+        if (other.numeBautura){
             numeBautura = new char[std::strlen(other.numeBautura) + 1];
             std::strcpy(numeBautura, other.numeBautura);
         }
         else numeBautura = nullptr;
-
-        if (other.listaIngrediente)
-        {
+        if (other.listaIngrediente){
             listaIngrediente = new Ingredient[other.nrIngrediente];
             for (int i=0; i<other.nrIngrediente; i++)
-                listaIngrediente[i] = other.listaIngrediente[i]; // Se bazează pe op= din Ingredient
+                listaIngrediente[i]=other.listaIngrediente[i]; // Se bazează pe op= din Ingredient
         }
         else listaIngrediente = nullptr;
     }
-
     ///Operator de copiere(op=)
-    Bautura& operator=(const Bautura& other)
-    {
+    Bautura& operator=(const Bautura& other){
         ///eliberez memoria
-        if (this!=&other)
-        {
+        if (this!=&other){
             delete[] numeBautura;
             delete[] listaIngrediente;
-
             ///copiez datele vechi
             pretPreparare=other.pretPreparare;
             timpPreparare=other.timpPreparare;
             nrIngrediente=other.nrIngrediente;
-
             ///aloc spatiu si copiez noul nume
-            if (other.numeBautura)
-            {
+            if (other.numeBautura){
                 numeBautura = new char[std::strlen(other.numeBautura) + 1];
                 std::strcpy(numeBautura, other.numeBautura);
             }
             else numeBautura = nullptr;
-
-            if (other.listaIngrediente)
-            {
+            if (other.listaIngrediente){
                 listaIngrediente = new Ingredient[other.nrIngrediente];
-                for (int i=0; i<other.nrIngrediente; ++i)
-                {
+                for (int i=0; i<other.nrIngrediente; i++)
                     listaIngrediente[i] = other.listaIngrediente[i]; // Se bazează pe op= din Ingredient
-                }
             }
             else listaIngrediente = nullptr;
         }
         return *this;
-
     }
     ///Destructor
-    ~Bautura()
-    {
-        delete[] numeBautura;
-        delete[] listaIngrediente;
-    }
-
+    ~Bautura()  {  delete[] numeBautura;  delete[] listaIngrediente; }
     ///Getteri
-    const char* getNumeBautura() const
-    {
-        return numeBautura;
-    }
-    int getTimpPreparare() const
-    {
-        return timpPreparare;
-    }
-    float getPretPreparare() const
-    {
-        return pretPreparare;
-    }
-
-    int getNrIngrediente() const
-    {
-        return nrIngrediente;
-    }
-
-
-    float calculeazaPret() const
-    {
-        float pretTotal=0;
-        for(int i=0; i<nrIngrediente; i++)
-        {
-            pretTotal+=listaIngrediente[i].getPret();
+    const char* getNumeBautura() const { return numeBautura; }
+    int getTimpPreparare() const { return timpPreparare; }
+    float getPretPreparare() const { return pretPreparare; }
+    Ingredient* getListaIngrediente() const { return listaIngrediente; }
+    int getNrIngrediente() const { return nrIngrediente; }
+    ///sett-er
+    void setNumeBautura(const char* numeBauturaNou){
+        if (numeBauturaNou){
+            delete[] numeBautura;
+            numeBautura=new char[strlen(numeBauturaNou)+1];
+            strcpy(numeBautura, numeBauturaNou);
         }
-        return pretTotal;
     }
-
-    float calculeazaKcal() const
-    {
-        float kcalTotal=0;
-        for(int i=0; i<nrIngrediente; i++)
-        {
-            kcalTotal+=listaIngrediente[i].getKcal();
-        }
-        return kcalTotal;
-    }
-
-    bool verificaVegan() const
-    {
-        bool ok=true;
-        for(int i=0; i<nrIngrediente; i++)
-        {
+    inline float calculeazaPret() const{return pretPreparare+calculPretIngrediente();} ///calculeaza pretul total al unei bauturi, cu tot cu pretul ingredientelor si a costului de preparare
+    inline bool verificaVegan() const///verifica daca bautura este vegana=>true else false
+    {  for(int i=0; i<nrIngrediente; i++){
             if(listaIngrediente[i].getVegan()==0)
-                ok=false;
+                return false;
         }
-        return ok;
+        return true;
     }
-
-    double aplicareReducere20() const
-    {
-        double pretRedus=calculeazaPret();
-        if(verificaVegan()==true)
-            pretRedus-=pretRedus*20/100;
-
-        return pretRedus;
+    inline bool verificaFaraZahar() const///verifica daca bautura nu are zahar=>true else false
+    {for(int i=0; i<nrIngrediente; i++){
+            if(listaIngrediente[i].getFaraZahar()==0)
+                return false;
+        }
+        return true;
     }
-
-    bool verificaStoc()
-    {
-        bool ok=true;
-        for(int i=0; i<nrIngrediente; i++)
-        {
+    bool verificaStoc() const///verifica daca bautura poate fi preparata(adica daca are toate ingredientele in stoc)
+    {for(int i=0; i<nrIngrediente; i++){
             if(listaIngrediente[i].getStoc()==0)
-                ok=false;
+               return false;
         }
-        return ok;
+        return true;
     }
-
-
     ///Friend pentru operatori
-    friend std::istream& operator>>(std::istream& is, Bautura& bau)
-    {
+    friend std::istream& operator>>(std::istream& is, Bautura& bau){
         char copie[300];
-        if(is>>copie>>bau.pretPreparare>>bau.timpPreparare>>bau.nrIngrediente)
-        {
+        if(is>>copie>>bau.pretPreparare>>bau.timpPreparare>>bau.nrIngrediente){
             delete[] bau.numeBautura;
             bau.numeBautura=new char[std::strlen(copie)+1];
             std::strcpy(bau.numeBautura, copie);
-
             delete[] bau.listaIngrediente;
             bau.listaIngrediente=new Ingredient[bau.nrIngrediente];
-
-            for(int i=0; i<bau.nrIngrediente; i++)
-            {
+            for(int i=0; i<bau.nrIngrediente; i++){
                 char numeIng[100];
                 is>>numeIng;
-
                 bau.listaIngrediente[i].setNume(numeIng);
             }
         }
-
         return is;
     }
-
-    friend std::ostream& operator<<(std::ostream& os, const Bautura& bau)
-    {
+    friend std::ostream& operator<<(std::ostream& os, const Bautura& bau){
         os<<"Nume: " << bau.numeBautura <<", pret preparare: " <<bau.pretPreparare<<", timp preparare: "<<bau.timpPreparare<<", lista de ingrediente: ";
         for(int i=0; i<bau.nrIngrediente-1; i++)
-        {
             os<<bau.listaIngrediente[i].getNume()<<", ";
-        }
         os<<bau.listaIngrediente[bau.nrIngrediente-1].getNume()<<"\n";
         return os;
     }
 };
-
-
-class comanda {
-    ///numar comanda
-    ///lista produse comandate
-    ///indice-in perparare, nu se poate prepara-stoc indisponibil, finalizare comanda
-    ///operator de afisare a comenzii care sa includ bautura, ingrediente plus specificatii extra, pret=bon
-    ///functie de verificare disponibilitate
-    ///tips?
-    ///timp de preparare, furnizare ora la care este gata comanda
-    ///ingrediente extra
-};
-
-
-
-///++generare de raport zilinic cu inasari =profit etc.
-int main() {
-    std::ifstream fin ("ingrediente.txt");
-    int nrIngrediente;
-    fin>>nrIngrediente;
-    Ingredient* camara=new Ingredient[nrIngrediente];
-    for (int i=0;i<nrIngrediente; i++) {
-        fin>>camara[i];
+class Comanda{
+private:
+    static double profitVanzari;///profitul total pe toate comenzile
+    static int nrTotalComenzi;///numarul total de comenzi pe sesiune de vanzari
+    char *numeClient;///numele clientului care initiaza o comanda
+    int nrBauturiComandate;///numarul de bauturi pe care le coamanda
+    Bautura* listaBauturi;///lista de bauturi cu pointer spre tipul Bautura pentru a retine bauturile comandate cu toat especificatiile din clasa Bautura
+    float totalPlata;///total plata per comanda
+    char *oraComandata;///ora la care se initiaza comanda, introdusa manual de catre client
+    inline void actualizeazaProfit(float pretBautura, bool esteVegan)///calculeaza profitul per bautura in fucntie de specificatiile acesteia, in cazul in care este vegana profitul este mai mic=20%, altfel 40%
+{       double profit;
+        if(esteVegan)
+            profit=pretBautura*0.2;
+        else
+            profit=pretBautura*0.4;
+        profitVanzari+=profit;///se aduna la profitul total
     }
-    for (int i=0;i<nrIngrediente; i++) {
-        std::cout<<camara[i];
+public:
+    ///Constructor implicit
+    Comanda(): numeClient(nullptr), nrBauturiComandate(0), listaBauturi(nullptr), totalPlata(0.0f), oraComandata(nullptr) {}
+    ///Constructor de initializare
+    Comanda(const char* numeClient_, int nrBauturiComandate_, float totalPlata_, const char* oraComandata_):  nrBauturiComandate(nrBauturiComandate_), totalPlata(totalPlata_){
+        if (numeClient_){
+            numeClient=new char[std::strlen(numeClient_)+1];
+            std::strcpy (numeClient, numeClient_);
+        }
+        else numeClient=nullptr;
+        if (oraComandata_){
+            oraComandata=new char[std::strlen(oraComandata_)+1];
+            std::strcpy (oraComandata, oraComandata_);
+        }
+        else oraComandata=nullptr;
+        if(nrBauturiComandate_>0)
+            listaBauturi=new Bautura[nrBauturiComandate_];
+        else listaBauturi=nullptr;
     }
-
-    int ok=-1;
-    while (ok!=0) {
-        std::cout << "--------- MENIU CAFENEA ---------\n";
-        std::cout << "1. Aprovizioneaza stoc\n";
-        std::cout << "2. Afiseaza stocul de ingrediente\n";
-        std::cout << "3. Comanda\n";
-        std::cout << "0. Iesire program\n";
-        std::cout << "Alegere: ";
-
-        std::cin>>ok;
-        switch (ok) {
-            case1:
-            for(int i=0; i<nrIngrediente; i++)
-            {
-                std::cout<<"cod produs: "<<i<<" ==> "<<camara[i]<<"\n";
+    ///Constructor de copiere (CC)
+    Comanda(const Comanda& other):nrBauturiComandate(other.nrBauturiComandate), totalPlata(other.totalPlata){
+        if (other.numeClient){
+            numeClient=new char[std::strlen (other.numeClient)+1];
+            std::strcpy (numeClient, other.numeClient);
+        }
+        else numeClient=nullptr;
+        if (other.listaBauturi){
+            listaBauturi=new Bautura[other.nrBauturiComandate];
+            for (int i=0; i<other.nrBauturiComandate; i++)
+                listaBauturi[i]=other.listaBauturi[i];
+        }
+        else listaBauturi=nullptr;
+        if (other.oraComandata){
+            oraComandata=new char[strlen(other.oraComandata) + 1];
+            strcpy(oraComandata, other.oraComandata);
+        }
+        else oraComandata=nullptr;
+    }
+///Operator de copiere(op=)
+    Comanda& operator=(const Comanda& other){
+        if (this!=&other){
+            delete [] numeClient;
+            delete [] listaBauturi;
+            delete [] oraComandata;
+            ///copiez datele vechi
+            nrBauturiComandate=other.nrBauturiComandate;
+            totalPlata=other.totalPlata;
+            ///aloc spatiu si copiez noul nume
+            if (other.numeClient){
+                numeClient=new char[std::strlen (other.numeClient)+1];
+                std::strcpy (numeClient, other.numeClient);
             }
-            std::cout << "Pentru reaprovizionare te rugam sa introduci codul produsului si stocul adaugat!\n";
-            int cod, aprovizionare;
-            std::cin>>cod>>aprovizionare;
-            camara[cod].reaprovizionare(aprovizionare);
-            std::cout<<"Ingredientul "<<camara[cod]<<" a fost reaprovizionat!\n";
+            else numeClient=nullptr;
+            if (other.oraComandata){
+                oraComandata=new char[strlen(other.oraComandata) + 1];
+                strcpy(oraComandata, other.oraComandata);
+            }
+            else oraComandata=nullptr;
+            if (other.listaBauturi){
+                listaBauturi=new Bautura[other.nrBauturiComandate];
+                for (int i=0; i<other.nrBauturiComandate; i++){
+                    listaBauturi[i]=other.listaBauturi[i];
+                }
+            }
+            else listaBauturi=nullptr;
+        }
+        return *this;
+    }
+///Destructor
+    ~Comanda(){  delete[] numeClient;  delete[] listaBauturi;  delete[] oraComandata;}
+///Gett-eri
+const char* getNumeClient()const{return numeClient;}
+int getNrBauturiComandate()const{return nrBauturiComandate;}
+float getTotalPlata()const{return totalPlata;}
+const char* getOraComandata()const{return oraComandata;}
+Bautura* getListaBauturi()const{return listaBauturi;}
+static int getNrTotalComenzi(){return nrTotalComenzi;}
+static double getProfitVanzari(){return profitVanzari;}
+    static void addComanda(){nrTotalComenzi++;}
+    float calculeazaKcal() const///aceasta functie este apelata doar dupa ce s-a trimis o comanda
+{float kcalTotal=0.0f;
+        for (int i=0; i<nrBauturiComandate; i++)///se trece prin toate bauturile comandate
+        {Ingredient* ingredienteProdus=listaBauturi[i].getListaIngrediente();///se creeaza o lista pentru a lua ingredientele corecte specifice fiecarei bauturi cu atributele implicite clasei Ingredient
+            int n=listaBauturi[i].getNrIngrediente();
+            float kcalBautura=0.0f;///aici se retin si kcal pentru fiecare bautura in parte
+            for(int j=0; j<n; j++)
+                kcalBautura+=ingredienteProdus[j].getKcal();///iau kcal de la fiecare ingredient continut
+            kcalTotal+=kcalBautura;
+            std::cout<<i+1<<". "<<listaBauturi[i].getNumeBautura()<<"  ==>  "<<kcalBautura<<" kcal\n";///afisez pentru fiecare bautura
+        }
+        return kcalTotal;///returnez kcal totale pe toata comanda
+    }
+    void bonFiscal()///aceasta functie genereaza un bon fiscal dupa ce s-a dat o comanda
+    {double sumaFinala=0;///suma totala de plata per comanda
+        int timpTotal=0;///timpul total de preparare per comanda
+        antet();///pentru aspect
+        std::cout<<"Nume Client: "<<numeClient<<"                      Ora Comenzii: "<<oraComandata<<"\n";
+        std::cout<<"-----------------------------------------------------------------\n";
+        std::cout<<"Numar Comanda: "<<nrTotalComenzi<<"\n";
+        std::cout<<"-----------------------------------------------------------------\n";
+        for (int i=0; i<nrBauturiComandate; i++){
+            bool vegan=false;
+            double pretBautura=listaBauturi[i].getPretPreparare();///base price
+            Ingredient* ingredienteProdus=listaBauturi[i].getListaIngrediente();///!!!de verificat daca merge cu functie de calculare a pretului
+            int n=listaBauturi[i].getNrIngrediente();
+            for(int j=0; j<n; j++)
+                pretBautura+=ingredienteProdus[j].getPret();
+            std::cout<<i+1<<". "<<listaBauturi[i].getNumeBautura()<<"  ";
+            if(listaBauturi[i].verificaFaraZahar())///verifica calitate Zero Zahar
+                std::cout<<"*(zero-zahar)  ";
+            if (listaBauturi[i].verificaVegan()){
+                vegan=true;
+                std::cout<<"*(vegan)-Aplica reducere 20%  ";///verifica calitate vegan+reduecere produs
+                pretBautura-=pretBautura*20/100;
+
+            }
+            actualizeazaProfit(pretBautura, vegan);///se actualizeaza profitul
+            std::cout<<" = "<<pretBautura<<" RON\n";///se afiseaza pret per bautura
+            sumaFinala+=pretBautura;
+            timpTotal+=listaBauturi[i].getTimpPreparare();
+        }
+        std::cout<<"-----------------------------------------------------------------\n";
+        std::cout<<"TOTAL DE PLATA:                          "<<sumaFinala<<" RON\n";
+        std::cout<<"Timp estimat de preparare:               "<<timpTotal/60<<" minute si "<<timpTotal%60<<" secunde\n";
+        std::cout<<"-----------------------------------------------------------------\n";
+        std::cout<<"--------------------------Va multumim!---------------------------\n";
+    }
+///Friend pentru operatori
+    friend std::istream& operator>>(std::istream& is, Comanda& com){
+        char copie[300];///numeclient+nrbauturi+ora coamndata
+        if (is>>copie>>com.nrBauturiComandate>>com.oraComandata){
+            delete[] com.numeClient;
+            com.numeClient=new char[std::strlen(copie)+1];
+            std::strcpy (com.numeClient, copie);
+            delete[] com.listaBauturi;
+            com.listaBauturi=new Bautura[com.nrBauturiComandate];
+            for (int i=0; i<com.nrBauturiComandate; i++){
+                char numeBau[100];
+                is>>numeBau;
+                com.listaBauturi[i].setNumeBautura(numeBau);
+            }
+        }
+        return is;
+    }
+    friend std::ostream& operator<<(std::ostream& os, const Comanda& com){
+        os<<"Nume client: "<<com.numeClient<<", comanda contine: ";
+        for (int i=0; i<com.nrBauturiComandate-1; i++)
+            os<<com.listaBauturi[i].getNumeBautura()<<", ";
+        os<<com.listaBauturi[com.nrBauturiComandate-1].getNumeBautura()<<", ora la care s-a dat comanda: "<<com.oraComandata<<"\n";
+        return os;
+    }
+};
+void afisare1(){
+    antet();
+    std::cout << "----------------------- MENIU CAFENEA ---------------------\n";
+    std::cout << "1. Detalii pentru angajati\n";
+    std::cout << "2. Cauta o bautura care contine sau NU un anumit ingredient\n";
+    std::cout << "3. Comanda\n";
+    std::cout << "4. Indecis? Consulta ce avem pe stoc din meniu\n";
+    std::cout << "5. Afla detalii despre un preparat\n";
+    std::cout << "0. Iesire program\n";
+    std::cout << "Introduceti optiunea: ";
+}
+void afisare2(){
+    antet();
+    std::cout << "1. Vezi bonul comenzii\n";
+    std::cout << "2. Vezi valorile nutritionale pentru intreaga comanda\n";
+    std::cout << "0. Intoarce-te la meniul principal\n";
+    std::cout << "Introduceti optiunea: ";
+}
+void afisare3(){
+    antet();
+    std::cout << "1. Aprovizioneaza stoc\n";
+    std::cout << "2. Calculeaza profit pe sesiune vanzari\n";
+    std::cout << "0. Intoarce-te la meniul principal\n";
+    std::cout << "Introduceti optiunea: ";
+}
+void antet(){
+    std::cout<<"=================================================================\n";
+    std::cout<<"                    Eliza's coffee shop                          \n";
+    std::cout<<"=================================================================\n";
+}
+int Comanda::nrTotalComenzi=0;///atributele statice sunt initializate
+double Comanda::profitVanzari=0.0d;
+int main()
+{
+    Comanda istoric[100];///am initiat un obiect istoric, unde voi retine toate comenzile per sesiune vanzari
+    int contorIstoric=0;///aici contor pentru a le putea retine pe parcurs, le si numara!!!!dar avem si nrTotalComenzi
+    Comanda comandaCurenta;///un obiect pentru comanda curenta, acesta se rescrie la fiecare comanda noua
+    std::ifstream fing ("ingrediente.txt");
+    int nrIngrediente;
+    fing>>nrIngrediente;
+    Ingredient* camara=new Ingredient[nrIngrediente];///declar o camara care are referinta spre tipul Ingredient pentru a salva ingredientele din fisier intr-un mod corect sa fie valorile atribuite corect tuturor atributelor
+    for (int i=0; i<nrIngrediente; i++)
+        fing>>camara[i];
+    std::ifstream fbau ("retete.txt");
+    int nrBauturi;
+    fbau>>nrBauturi;
+    Bautura* meniu=new Bautura[nrBauturi];///fac la fel si pentru bauturi
+    for(int i=0; i<nrBauturi; i++){
+        fbau>>meniu[i];
+        int nrIngrBautura=meniu[i].getNrIngrediente();///retinem nr de ingrediente pe care le are bautura i din meniu
+        Ingredient* listaIngrBautura=meniu[i].getListaIngrediente();///si cream o lista cu acestea, deoarece altfel in cadrul bauturilor din meniu ingredientele nu vor avea niciun atribut vor avea doar numele, iar in rest valorile care ne intereseaza vor ramane implicite(0)
+        for(int j=0; j<nrIngrBautura; j++){
+            int poz=-1;
+            const char *nume=listaIngrBautura[j].getNume();
+            for(int k=0; k<nrIngrediente; k++)
+                if(strcmp(camara[k].getNume(), nume)==0)
+                    poz=k;
+            if(poz!=-1)///daca ingredientul exista in camara
+                listaIngrBautura[j]=camara[poz];///adaug la lista ingredientelor, atributele din camara
+        }
+    }
+    int ok=-1;
+    while (ok!=0){
+        afisare1();
+        std::cin>>ok;
+        switch (ok){
+        case 1:{
+            afisare3();
+            int ok1=-1;
+            while(ok1!=0){
+                std::cin>>ok1;
+                switch(ok1){
+                case 1:{
+                    antet();
+                    for(int i=0; i<nrIngrediente; i++)///se afiseaza pentru vanzator, sa vada mai bine{
+                        std::cout<<"cod produs: "<<i<<" ==> "<<camara[i]<<"\n";
+                    std::cout<<"**********************************************************************************\n";
+                    std::cout << "Pentru reaprovizionare te rugam sa introduci codul produsului si stocul adaugat!\n";
+                    int cod, aprovizionare;///astea reprezinta numarul de ordine si cu cat sa fie suplimentat
+                    std::cin>>cod>>aprovizionare;
+                    camara[cod].reaprovizionare(aprovizionare);///se apeleaza functia care suplimenteaza stocul elementului camara[cod]
+                    std::cout<<"\nIngredientul selectat a fost reaprovizionat!\n"<<camara[cod]<<"\n";
+                    afisare3();
+                    break;
+                }
+                case 2:{
+                    antet();
+                    std::cout<<"------------------------RAPORT FINANCIAR-------------------------\n";
+                    std::cout<<std::endl;
+                    std::cout<<"Profitul pentru aceasta sesiune de vanzari este in valoare de "<<Comanda::getProfitVanzari()<<" RON\n";///se afiseaza atributul static
+                    std::cout<<std::endl;
+                    afisare3();
+                    break;
+                }
+                case 0:
+                    break;
+                }
+            }
             break;
-            case 2:
+        }
+        case 2:{
+            antet();
+            char raspuns[5];
+            char ingredient[100];
+            std::cout<<"Despre ce ingredient este vorba?\n";
+            std::cin>>ingredient;
+            std::cout<<"Doresti ca bautura sa contina sau nu ingredientul? Raspunde cu 'da' sau 'nu'.\n";
+            std::cin>>raspuns;
+            std::cout<<"Bauturi in meniu cu specificatiile dorite:\n";
+            if(strcmp(raspuns, "da")==0)///in functie de raspuns
+                {int ver=0;
+                for(int i=0; i<nrBauturi; i++){
+                    Ingredient* ingredienteProdus=meniu[i].getListaIngrediente();
+                    int n=meniu[i].getNrIngrediente();
+                    int verif=0;
+                    for(int j=0; j<n; j++)
+                        if(strcmp(ingredienteProdus[j].getNume(), ingredient)==0)///daca am gasit acest ingredient in bautura => afisez bautura
+                            verif=1;
+                    if(verif==1){
+                        ver=1;
+                        std::cout<<"-"<<meniu[i].getNumeBautura()<<"\n";
+                    }
+                }
+                if(ver==0)///daca nu a fost gasit niciun preparat cu acest ingredient
+                    std::cout<<"Momentan nu sunt disponibile produse cu aceste specificatii, ne pare rau!\n";
+            }
+            else{
+                int ver=0;
+                for(int i=0; i<nrBauturi; i++){
+                    Ingredient* ingredienteProdus=meniu[i].getListaIngrediente();
+                    int n=meniu[i].getNrIngrediente();
+                    int verif=1;
+                    for(int j=0; j<n; j++)
+                        if(strcmp(ingredienteProdus[j].getNume(), ingredient)==0)///daca am gasit o bautura cu acest ingredient, automat excludem acest preparat
+                            verif=0;
+                    if(verif==1){
+                        ver=1;
+                        std::cout<<"-"<<meniu[i].getNumeBautura()<<"\n";///daca nu a fost gasim, afisam
+                    }
+                }
+                if(ver==0)
+                    std::cout<<"Momentan nu sunt disponibile produse cu aceste specificatii, ne pare rau!\n";///daca toate produsele contin ingredientul
+            }
             break;
-            case 3:
+        }
+        case 3:{
+            antet();
+            char nume[100], ora[10];
+            int nr;
+            std::cout<<"Completare date pentru comanda...\n"; std::cin.get();///se elibereaza memorie
+            std::cout<<"Introduceti numele si prenumele: "; std::cin.getline(nume, 100);
+            std::cout<<"Introduceti ora comenzii: "; std::cin>>ora;
+            std::cout<<"Cate bauturi doriti sa comandati? ";  std::cin>>nr;
+            comandaCurenta=Comanda(nume, nr, 0.0f, ora);
+            istoric[contorIstoric]=Comanda(nume, nr, 0.0f, ora);
+            Comanda::addComanda();///tinem evidenta la comanda
+            for(int i=0; i<nr; i++){
+                char numeBautura[100];
+                std::cout<<"Bautura "<<i+1<<": ";
+                std::cin>>numeBautura;
+                bool exista=false;///pentru a verifica daca exista
+                bool stoc=true;///si daca este in stoc
+                for(int j=0; j<nrBauturi; j++){
+                    if(strcmp(meniu[j].getNumeBautura(), numeBautura)==0){
+                        exista=true;
+                        Ingredient* ingredienteProdus=meniu[j].getListaIngrediente();
+                        int n=meniu[j].getNrIngrediente();
+                        bool stoc=true;
+                        for(int k=0; k<n; k++)
+                            if(ingredienteProdus[k].getStoc()==0) {
+                                stoc=false;
+                                break;
+                            }
+                        if(stoc==false){
+                            std::cout<<"Din pacate produsul introdus nu este momentan pe stoc! Va rugam introduceti alta bautura!\n";
+                            i--;
+                        }
+                        else{
+                            comandaCurenta.getListaBauturi()[i]=meniu[j];///aici pentru a consuma din ingrediente
+                            for(int k=0; k<n; k++){
+                                for(int m=0; m<nrIngrediente; m++){
+                                    if(strcmp(camara[m].getNume(), ingredienteProdus[k].getNume())==0){
+                                        camara[m].consumaStoc();
+                                        break;
+                                    }
+                                }
+                            }
+
+                        }
+                        exista=true;
+                        break;
+                    }
+                }
+                if(exista==false){
+                    std::cout<<"Ne pare rau! Nu avem inca aceasta bautura in meniu! Incercati din nou!\n";
+                    i--;
+                }
+            }
+            std::cout<<"COMANDA INREGISTRATA CU SUCCES!\n";
+            afisare2();
+            int ok2=-1;
+            while(ok2!=0){
+                std::cin>>ok2;
+                switch(ok2){
+                case 1:{
+                    comandaCurenta.bonFiscal();///generare bon fiscal prin apelare functie
+                    afisare2();
+                    break;
+                }
+                case 2:{
+                    std::cout<<"--------------------------------------------------\n";
+                    std::cout<<"Valorile nutritionale pentru comanda dvs sunt disponibile!\n";
+                    int total=comandaCurenta.calculeazaKcal();
+                    std::cout<<"Pentru toata comanda aveti "<<total<<" kilocalorii.\n";
+                    afisare2();
+                    break;
+                }
+                case 0:
+                    break;
+                }
+            }
+            contorIstoric++;
             break;
-            case 0:
+        }
+        case 4:{
+            antet(); ///bauturi care sunt in stoc;
+            std::cout<<"OPTIUNILE NOASTE: \n";
+            std::cout<<std::endl;
+            for(int i=0; i<nrBauturi; i++){
+                Ingredient* ingredienteProdus=meniu[i].getListaIngrediente();
+                int n=meniu[i].getNrIngrediente();
+                bool stoc=true;
+                for(int j=0; j<n; j++)
+                    if(ingredienteProdus[j].getStoc()==0)
+                        stoc=false;
+                if(stoc==true)
+                    std::cout<<meniu[i].getNumeBautura()<<"\n";
+            }
             break;
-            default:
+        }
+        case 5:{
+            antet(); ///detalii preparat: nume, vegan, fara zahar, ingrediente, pret, kcal
+            std::cout<<"Introduceti va rog numele preparatului despre care doriti sa vedeti detalii: ";
+            char numePreparat[100];
+            std::cin>>numePreparat;
+            bool ok=false;///verificam daca exista
+            for(int i=0; i<nrBauturi; i++){
+                if(strcmp(meniu[i].getNumeBautura(), numePreparat)==0){
+                    ok=true;
+                    float pret=0.0f, kcal=0.0f;
+                    bool stoc=true;
+                    std::cout<<meniu[i].getNumeBautura()<<": \n";
+                    if(meniu[i].verificaFaraZahar())
+                        std::cout<<"*fara zahar*\n";
+                    else
+                        std::cout<<"*contine zahar*\n";
+                    if(meniu[i].verificaVegan())
+                        std::cout<<"*vegan*\n";
+                    else
+                        std::cout<<"*non-vegan*\n";
+                    pret=meniu[i].calculeazaPret();
+                    Ingredient* ingredienteProdus=meniu[i].getListaIngrediente();
+                    int n=meniu[i].getNrIngrediente();
+                    for(int j=0; j<n; j++){
+                        kcal+=ingredienteProdus[j].getKcal();
+                        if(ingredienteProdus[j].getStoc()==0)
+                            stoc=false;
+                    }
+                    std::cout<<"*"<<kcal<<" kcal*\n";
+                    std::cout<<"*"<<pret<<" RON*\n";
+                    if(stoc==true)
+                        std::cout<<"*ESTE IN STOC*\n";
+                    else
+                        std::cout<<"*NU ESTE IN STOC*\n";
+                }
+            }
+            if(ok==false)
+                std::cout<<"Ne pare rau! Nu avem inca aceasta bautura in meniu!\n";
+            break;
+        }
+        case 0:
             break;
         }
     }
-    fin.close();
+    fing.close();
+    fbau.close();
     delete[] camara;
+    delete[] meniu;
     return 0;
 }
