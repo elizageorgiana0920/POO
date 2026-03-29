@@ -1,5 +1,4 @@
 #include<iostream>
-#include<fstream>
 #include<cstring>
 void antet();
 class Ingredient
@@ -110,7 +109,7 @@ public:
     ///Constructor implicit
     Bautura():numeBautura(nullptr), pretPreparare(0.0f), timpPreparare(0), listaIngrediente(nullptr), nrIngrediente(0) {}
     ///Constructor de initializare
-    Bautura(const char* numeBautura_, float pretPreparare_, int timpPreparare_): pretPreparare{pretPreparare_}, timpPreparare{timpPreparare_}{
+    Bautura(const char* numeBautura_, float pretPreparare_, int timpPreparare_): pretPreparare{pretPreparare_}, timpPreparare{timpPreparare_}, listaIngrediente(nullptr), nrIngrediente(0){
         if (numeBautura_){
             numeBautura = new char[std::strlen(numeBautura_) + 1];
             std::strcpy(numeBautura, numeBautura_);
@@ -174,7 +173,13 @@ public:
     }
     void setTimpPreparare(int timpPreparareNou){ timpPreparare=timpPreparareNou; }
     void setPretPreparare(float pretPreparareNou) {pretPreparare=pretPreparareNou;}
-    void setNrIngrediente(int nrIngredienteNou) {nrIngrediente=nrIngredienteNou;}
+    void setNrIngrediente(int nrIngredienteNou) {
+        if (nrIngredienteNou>0) {
+            delete [] listaIngrediente;;
+            nrIngrediente=nrIngredienteNou;
+            listaIngrediente=new Ingredient[nrIngrediente];
+        }
+    }
     inline float calculeazaPret() const{return pretPreparare+calculPretIngrediente();} ///calculeaza pretul total al unei bauturi, cu tot cu pretul ingredientelor si a costului de preparare
     inline bool verificaVegan() const///verifica daca bautura este vegana=>true else false
     {  for(int i=0; i<nrIngrediente; i++){
@@ -425,31 +430,154 @@ int Comanda::nrTotalComenzi=0;///atributele statice sunt initializate
 double Comanda::profitVanzari=0.0d;
 int main()
 {
-    Comanda istoric[100];///am initiat un obiect istoric, unde voi retine toate comenzile per sesiune vanzari
-    int contorIstoric=0;///aici contor pentru a le putea retine pe parcurs, le si numara!!!!dar avem si nrTotalComenzi
     Comanda comandaCurenta;///un obiect pentru comanda curenta, acesta se rescrie la fiecare comanda noua
-    std::ifstream fing ("ingrediente.txt");
-    int nrIngrediente;
-    fing>>nrIngrediente;
+    int nrIngrediente=25;
     Ingredient* camara=new Ingredient[nrIngrediente];///declar o camara care are referinta spre tipul Ingredient pentru a salva ingredientele din fisier intr-un mod corect sa fie valorile atribuite corect tuturor atributelor
-    for (int i=0; i<nrIngrediente; i++)
-        fing>>camara[i];
-    std::ifstream fbau ("retete.txt");
-    int nrBauturi;
-    fbau>>nrBauturi;
+    camara[0] = Ingredient("Cafea_Arabica", 50, 2.5, 1, 1, 2);
+    camara[1] = Ingredient("Cafea_Robusta", 3000, 1.8, 1, 1, 2);
+    camara[2] = Ingredient("Matcha_Pudra", 500, 8.0, 1, 1, 30);
+    camara[3] = Ingredient("Ciocolata_Neagra_Pudra", 1000, 3.5, 1, 0, 45);
+    camara[4] = Ingredient("Ciocolata_Alba_Lichida", 1000, 4.0, 0, 0, 55);
+    camara[5] = Ingredient("Ceai_Verde_Frunze", 300, 5.0, 1, 1, 1);
+    camara[6] = Ingredient("Ceai_Negru_Earle_Grey", 300, 5.0, 1, 1, 1);
+    camara[7] = Ingredient("Ceai_Fructe_Padure", 500, 4.0, 1, 1, 2);
+    camara[8] = Ingredient("Lapte_Vaca", 10000, 1.2, 0, 0, 6);
+    camara[9] = Ingredient("Lapte_Migdale", 2000, 3.5, 1, 1, 3);
+    camara[10] = Ingredient("Lapte_Ovaz", 2000, 3.0, 1, 0, 5);
+    camara[11] = Ingredient("Lapte_Soia", 2000, 2.8, 1, 1, 4);
+    camara[12] = Ingredient("Frisca_Lichida", 1500, 2.5, 0, 0, 35);
+    camara[13] = Ingredient("Sirop_Vanilie", 1000, 4.5, 1, 0, 30);
+    camara[14] = Ingredient("Sirop_Caramel_Sarat", 1000, 4.8, 1, 0, 32);
+    camara[15] = Ingredient("Sirop_Fistic", 1000, 6.0, 1, 0, 35);
+    camara[16] = Ingredient("Sirop_Alune_Padure", 1000, 4.5, 1, 0, 31);
+    camara[17] = Ingredient("Zahar_Alb", 5000, 0.2, 1, 0, 40);
+    camara[18] = Ingredient("Zahar_Brun", 3000, 0.4, 1, 0, 38);
+    camara[19] = Ingredient("Stevia", 200, 1.5, 1, 1, 0);
+    camara[20] = Ingredient("Miere_Bio", 1000, 2.0, 1, 0, 30);
+    camara[21] = Ingredient("Apa_Plata", 400, 0.1, 1, 1, 0);
+    camara[22] = Ingredient("Scortisoara", 200, 1.5, 1, 1, 2);
+    camara[23] = Ingredient("Pudra_Cardamom", 100, 2.5, 1, 1, 3);
+    camara[24] = Ingredient("Mini_Marshmallows", 500, 3.0, 0, 0, 33);
+    int nrBauturi=15;
     Bautura* meniu=new Bautura[nrBauturi];///fac la fel si pentru bauturi
+
+    // 0. Espresso_Scurt
+    meniu[0] = Bautura("Espresso_Scurt", 5.0, 30);
+    meniu[0].setNrIngrediente(2);
+    meniu[0].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[0].getListaIngrediente()[1].setNume("Apa_Plata");
+
+    // 1. Cappuccino_Clasic
+    meniu[1] = Bautura("Cappuccino_Clasic", 7.0, 120);
+    meniu[1].setNrIngrediente(4);
+    meniu[1].getListaIngrediente()[0].setNume("Cafea_Robusta");
+    meniu[1].getListaIngrediente()[1].setNume("Apa_Plata");
+    meniu[1].getListaIngrediente()[2].setNume("Lapte_Vaca");
+    meniu[1].getListaIngrediente()[3].setNume("Scortisoara");
+
+    // 2. Caffe_Latte
+    meniu[2] = Bautura("Caffe_Latte", 8.0, 150);
+    meniu[2].setNrIngrediente(3);
+    meniu[2].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[2].getListaIngrediente()[1].setNume("Apa_Plata");
+    meniu[2].getListaIngrediente()[2].setNume("Lapte_Vaca");
+
+    // 3. Flat_White
+    meniu[3] = Bautura("Flat_White", 9.0, 130);
+    meniu[3].setNrIngrediente(2);
+    meniu[3].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[3].getListaIngrediente()[1].setNume("Lapte_Vaca");
+
+    // 4. Matcha_Latte_Vegan
+    meniu[4] = Bautura("Matcha_Latte_Vegan", 12.0, 180);
+    meniu[4].setNrIngrediente(4);
+    meniu[4].getListaIngrediente()[0].setNume("Matcha_Pudra");
+    meniu[4].getListaIngrediente()[1].setNume("Apa_Plata");
+    meniu[4].getListaIngrediente()[2].setNume("Lapte_Migdale");
+    meniu[4].getListaIngrediente()[3].setNume("Stevia");
+
+    // 5. Oat_Vanilla_Latte
+    meniu[5] = Bautura("Oat_Vanilla_Latte", 10.0, 160);
+    meniu[5].setNrIngrediente(3);
+    meniu[5].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[5].getListaIngrediente()[1].setNume("Lapte_Ovaz");
+    meniu[5].getListaIngrediente()[2].setNume("Sirop_Vanilie");
+
+    // 6. Ceai_Verde_Bio
+    meniu[6] = Bautura("Ceai_Verde_Bio", 6.0, 240);
+    meniu[6].setNrIngrediente(3);
+    meniu[6].getListaIngrediente()[0].setNume("Ceai_Verde_Frunze");
+    meniu[6].getListaIngrediente()[1].setNume("Apa_Plata");
+    meniu[6].getListaIngrediente()[2].setNume("Miere_Bio");
+
+    // 7. Cortado_Migdale
+    meniu[7] = Bautura("Cortado_Migdale", 7.5, 90);
+    meniu[7].setNrIngrediente(2);
+    meniu[7].getListaIngrediente()[0].setNume("Cafea_Robusta");
+    meniu[7].getListaIngrediente()[1].setNume("Lapte_Migdale");
+
+    // 8. Choco_White_Snow
+    meniu[8] = Bautura("Choco_White_Snow", 11.0, 200);
+    meniu[8].setNrIngrediente(4);
+    meniu[8].getListaIngrediente()[0].setNume("Ciocolata_Alba_Lichida");
+    meniu[8].getListaIngrediente()[1].setNume("Lapte_Vaca");
+    meniu[8].getListaIngrediente()[2].setNume("Frisca_Lichida");
+    meniu[8].getListaIngrediente()[3].setNume("Mini_Marshmallows");
+
+    // 9. Caramel_Macchiato
+    meniu[9] = Bautura("Caramel_Macchiato", 10.5, 170);
+    meniu[9].setNrIngrediente(4);
+    meniu[9].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[9].getListaIngrediente()[1].setNume("Lapte_Vaca");
+    meniu[9].getListaIngrediente()[2].setNume("Sirop_Caramel_Sarat");
+    meniu[9].getListaIngrediente()[3].setNume("Zahar_Brun");
+
+    // 10. Mocha_Fistic
+    meniu[10] = Bautura("Mocha_Fistic", 12.5, 210);
+    meniu[10].setNrIngrediente(4);
+    meniu[10].getListaIngrediente()[0].setNume("Ciocolata_Neagra_Pudra");
+    meniu[10].getListaIngrediente()[1].setNume("Cafea_Robusta");
+    meniu[10].getListaIngrediente()[2].setNume("Lapte_Vaca");
+    meniu[10].getListaIngrediente()[3].setNume("Sirop_Fistic");
+
+    // 11. Hot_Choco_Cardamom
+    meniu[11] = Bautura("Hot_Choco_Cardamom", 10.0, 190);
+    meniu[11].setNrIngrediente(4);
+    meniu[11].getListaIngrediente()[0].setNume("Ciocolata_Neagra_Pudra");
+    meniu[11].getListaIngrediente()[1].setNume("Lapte_Vaca");
+    meniu[11].getListaIngrediente()[2].setNume("Pudra_Cardamom");
+    meniu[11].getListaIngrediente()[3].setNume("Zahar_Alb");
+
+    // 12. London_Fog
+    meniu[12] = Bautura("London_Fog", 9.5, 300);
+    meniu[12].setNrIngrediente(4);
+    meniu[12].getListaIngrediente()[0].setNume("Ceai_Negru_Earle_Grey");
+    meniu[12].getListaIngrediente()[1].setNume("Apa_Plata");
+    meniu[12].getListaIngrediente()[2].setNume("Lapte_Vaca");
+    meniu[12].getListaIngrediente()[3].setNume("Sirop_Vanilie");
+
+    // 13. Ceai_Fructe_Iarna
+    meniu[13] = Bautura("Ceai_Fructe_Iarna", 7.0, 300);
+    meniu[13].setNrIngrediente(4);
+    meniu[13].getListaIngrediente()[0].setNume("Ceai_Fructe_Padure");
+    meniu[13].getListaIngrediente()[1].setNume("Apa_Plata");
+    meniu[13].getListaIngrediente()[2].setNume("Scortisoara");
+    meniu[13].getListaIngrediente()[3].setNume("Miere_Bio");
+
+    // 14. Americano
+    meniu[14] = Bautura("Americano", 5.0, 60);
+    meniu[14].setNrIngrediente(2);
+    meniu[14].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[14].getListaIngrediente()[1].setNume("Apa_Plata");
+
     for(int i=0; i<nrBauturi; i++){
-        fbau>>meniu[i];
         int nrIngrBautura=meniu[i].getNrIngrediente();///retinem nr de ingrediente pe care le are bautura i din meniu
         Ingredient* listaIngrBautura=meniu[i].getListaIngrediente();///si cream o lista cu acestea, deoarece altfel in cadrul bauturilor din meniu ingredientele nu vor avea niciun atribut vor avea doar numele, iar in rest valorile care ne intereseaza vor ramane implicite(0)
         for(int j=0; j<nrIngrBautura; j++){
-            int poz=-1;
             const char *nume=listaIngrBautura[j].getNume();
             for(int k=0; k<nrIngrediente; k++)
-                if(strcmp(camara[k].getNume(), nume)==0)
-                    poz=k;
-            if(poz!=-1)///daca ingredientul exista in camara
-                listaIngrBautura[j]=camara[poz];///adaug la lista ingredientelor, atributele din camara
+                if(nume !=nullptr && strcmp(camara[k].getNume(), nume)==0)
+                    listaIngrBautura[j]=camara[k];
         }
     }
     int ok=-1;
@@ -545,7 +673,6 @@ int main()
             std::cout<<"Introduceti ora comenzii: "; std::cin>>ora;
             std::cout<<"Cate bauturi doriti sa comandati? ";  std::cin>>nr;
             comandaCurenta=Comanda(nume, nr, 0.0f, ora);
-            istoric[contorIstoric]=Comanda(nume, nr, 0.0f, ora);
             Comanda::addComanda();///tinem evidenta la comanda
             for(int i=0; i<nr; i++){
                 char numeBautura[100];
@@ -612,7 +739,6 @@ int main()
                     break;
                 }
             }
-            contorIstoric++;
             break;
         }
         case 4:{
@@ -675,8 +801,6 @@ int main()
             break;
         }
     }
-    fing.close();
-    fbau.close();
     delete[] camara;
     delete[] meniu;
     return 0;
