@@ -428,6 +428,7 @@ void antet(){
 }
 int Comanda::nrTotalComenzi=0;///atributele statice sunt initializate
 double Comanda::profitVanzari=0.0d;
+/*
 int main()
 {
     Comanda comandaCurenta;///un obiect pentru comanda curenta, acesta se rescrie la fiecare comanda noua
@@ -803,5 +804,128 @@ int main()
     }
     delete[] camara;
     delete[] meniu;
+    return 0;
+}
+*/
+int main() {
+    ///initiez camara din main fara fisiere externe
+    int nrIngrediente = 25;
+    Ingredient* camara = new Ingredient[nrIngrediente];
+    camara[0] = Ingredient("Cafea_Arabica", 50, 2.5, 1, 1, 2);
+    camara[1] = Ingredient("Cafea_Robusta", 3000, 1.8, 1, 1, 2);
+    camara[2] = Ingredient("Matcha_Pudra", 500, 8.0, 1, 1, 30);
+    camara[3] = Ingredient("Ciocolata_Neagra_Pudra", 1000, 3.5, 1, 0, 45);
+    camara[4] = Ingredient("Ciocolata_Alba_Lichida", 1000, 4.0, 0, 0, 55);
+    camara[5] = Ingredient("Ceai_Verde_Frunze", 300, 5.0, 1, 1, 1);
+    camara[6] = Ingredient("Ceai_Negru_Earle_Grey", 300, 5.0, 1, 1, 1);
+    camara[7] = Ingredient("Ceai_Fructe_Padure", 500, 4.0, 1, 1, 2);
+    camara[8] = Ingredient("Lapte_Vaca", 10000, 1.2, 0, 0, 6);
+    camara[9] = Ingredient("Lapte_Migdale", 2000, 3.5, 1, 1, 3);
+    camara[10] = Ingredient("Lapte_Ovaz", 2000, 3.0, 1, 0, 5);
+    camara[11] = Ingredient("Lapte_Soia", 2000, 2.8, 1, 1, 4);
+    camara[12] = Ingredient("Frisca_Lichida", 1500, 2.5, 0, 0, 35);
+    camara[13] = Ingredient("Sirop_Vanilie", 1000, 4.5, 1, 0, 30);
+    camara[14] = Ingredient("Sirop_Caramel_Sarat", 1000, 4.8, 1, 0, 32);
+    camara[15] = Ingredient("Sirop_Fistic", 1000, 6.0, 1, 0, 35);
+    camara[16] = Ingredient("Sirop_Alune_Padure", 1000, 4.5, 1, 0, 31);
+    camara[17] = Ingredient("Zahar_Alb", 5000, 0.2, 1, 0, 40);
+    camara[18] = Ingredient("Zahar_Brun", 3000, 0.4, 1, 0, 38);
+    camara[19] = Ingredient("Stevia", 200, 1.5, 1, 1, 0);
+    camara[20] = Ingredient("Miere_Bio", 1000, 2.0, 1, 0, 30);
+    camara[21] = Ingredient("Apa_Plata", 400, 0.1, 1, 1, 0);
+    camara[22] = Ingredient("Scortisoara", 200, 1.5, 1, 1, 2);
+    camara[23] = Ingredient("Pudra_Cardamom", 100, 2.5, 1, 1, 3);
+    camara[24] = Ingredient("Mini_Marshmallows", 500, 3.0, 0, 0, 33);
+
+    ///initiez si meniul de baututri fara fisiere externe
+    int nrBauturi = 15;
+    Bautura* meniu = new Bautura[nrBauturi];
+
+    meniu[0] = Bautura("Espresso_Scurt", 5.0, 30);
+    meniu[0].setNrIngrediente(2);
+    meniu[0].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[0].getListaIngrediente()[1].setNume("Apa_Plata");
+
+    meniu[14] = Bautura("Americano", 5.0, 60);
+    meniu[14].setNrIngrediente(2);
+    meniu[14].getListaIngrediente()[0].setNume("Cafea_Arabica");
+    meniu[14].getListaIngrediente()[1].setNume("Apa_Plata");
+
+    for(int i=0; i<nrBauturi; i++){
+        int nrIngrBautura=meniu[i].getNrIngrediente();///retinem nr de ingrediente pe care le are bautura i din meniu
+        Ingredient* listaIngrBautura=meniu[i].getListaIngrediente();///si cream o lista cu acestea, deoarece altfel in cadrul bauturilor din meniu ingredientele nu vor avea niciun atribut vor avea doar numele, iar in rest valorile care ne intereseaza vor ramane implicite(0)
+        for(int j=0; j<nrIngrBautura; j++){
+            const char *nume=listaIngrBautura[j].getNume();
+            for(int k=0; k<nrIngrediente; k++)
+                if(nume !=nullptr && strcmp(camara[k].getNume(), nume)==0)
+                    listaIngrBautura[j]=camara[k];
+        }
+    }
+
+    /// --- TESTARE AUTOMATA ---
+    // TEST OPTIUNEA 2: Cautare ingredient "Apa_Plata"
+    std::cout << "optiunea 2: Cautare 'Apa_Plata' (DA)\n";
+    for(int i=0; i<nrBauturi; i++) {
+        if(meniu[i].getNumeBautura() == nullptr) continue;
+        for(int j=0; j<meniu[i].getNrIngrediente(); j++) {
+            if(strcmp(meniu[i].getListaIngrediente()[j].getNume(), "Apa_Plata") == 0)
+                std::cout << " - " << meniu[i].getNumeBautura() << "\n";
+        }
+    }
+
+    // TEST OPTIUNEA 3: Comanda Eliza Boros
+    std::cout << "\noptiunea 3: Creare Comanda Eliza Boros, 12:15, 2 bauturi\n";
+    Comanda comandaCurenta("Eliza Boros", 2, 0.0f, "12:15");
+    Comanda::addComanda();
+
+    // Adăugăm băuturile (Espresso_Scurt și Americano)
+    comandaCurenta.getListaBauturi()[0] = meniu[0];
+    comandaCurenta.getListaBauturi()[1] = meniu[14];
+
+    // Scădem stocul manual (cum era in switch)
+    for(int b=0; b<2; b++) {
+        for(int i=0; i<comandaCurenta.getListaBauturi()[b].getNrIngrediente(); i++) {
+            for(int k=0; k<nrIngrediente; k++) {
+                if(strcmp(camara[k].getNume(), comandaCurenta.getListaBauturi()[b].getListaIngrediente()[i].getNume()) == 0)
+                    camara[k].consumaStoc();
+            }
+        }
+    }
+    std::cout << "COMANDA INREGISTRATA CU SUCCES!\n";
+
+    // TEST OPTIUNEA 3 -> 1: Bon Fiscal
+    std::cout << "\noptiunea 3 -> 1: Vizualizare Bon\n";
+    comandaCurenta.bonFiscal();
+
+    // TEST OPTIUNEA 3 -> 2: Kcal
+    std::cout << "\noptiunea 3 -> 2: Valori nutritionale\n";
+    int kcalTotal = comandaCurenta.calculeazaKcal();
+    std::cout << "Total comanda: " << kcalTotal << " kcal\n";
+
+    // TEST OPTIUNEA 1 -> 1: Aprovizionare (Cod 23, Cantitate 20)
+    std::cout << "\noptiunea 1 -> 1: Aprovizionare Cardamom\n";
+    std::cout << "Inainte: " << camara[23];
+    camara[23].reaprovizionare(20);
+    std::cout << "Dupa: " << camara[23];
+
+    // TEST OPTIUNEA 1 -> 2: Profit
+    std::cout << "\noptiunea 1 -> 2: Profit sesiune\n";
+    std::cout << "Profit total: " << Comanda::getProfitVanzari() << " RON\n";
+
+    // TEST OPTIUNEA 4: Stoc meniu
+    std::cout << "\noptiunea 4: Ce avem pe stoc\n";
+    for(int i=0; i<nrBauturi; i++) {
+        if(meniu[i].getNumeBautura() != nullptr && meniu[i].verificaStoc())
+            std::cout << " - " << meniu[i].getNumeBautura() << "\n";
+    }
+
+    // TEST OPTIUNEA 5: Detalii Americano
+    std::cout << "\noptiunea 5: Detalii 'Americano'\n";
+    std::cout << "Pret: " << meniu[14].calculeazaPret() << " RON | "
+              << (meniu[14].verificaVegan() ? "Vegan" : "Non-vegan") << "\n";
+
+    delete[] camara;
+    delete[] meniu;
+
     return 0;
 }
