@@ -126,7 +126,7 @@ public:
         if (other.listaIngrediente){
             listaIngrediente = new Ingredient[other.nrIngrediente];
             for (int i=0; i<other.nrIngrediente; i++)
-                listaIngrediente[i]=other.listaIngrediente[i]; // Se bazează pe op= din Ingredient
+                listaIngrediente[i]=other.listaIngrediente[i]; // Se bazeaza pe op= din Ingredient
         }
         else listaIngrediente = nullptr;
     }
@@ -149,7 +149,7 @@ public:
             if (other.listaIngrediente){
                 listaIngrediente = new Ingredient[other.nrIngrediente];
                 for (int i=0; i<other.nrIngrediente; i++)
-                    listaIngrediente[i] = other.listaIngrediente[i]; // Se bazează pe op= din Ingredient
+                    listaIngrediente[i] = other.listaIngrediente[i]; // Se bazeaza pe op= din Ingredient
             }
             else listaIngrediente = nullptr;
         }
@@ -878,11 +878,11 @@ int main() {
     Comanda comandaCurenta("Eliza Boros", 2, 0.0f, "12:15");
     Comanda::addComanda();
 
-    // Adăugăm băuturile (Espresso_Scurt și Americano)
+    // Adaugam bauturile (Espresso_Scurt si Americano)
     comandaCurenta.getListaBauturi()[0] = meniu[0];
     comandaCurenta.getListaBauturi()[1] = meniu[14];
 
-    // Scădem stocul manual (cum era in switch)
+    // Scadem stocul manual (cum era in switch)
     for(int b=0; b<2; b++) {
         for(int i=0; i<comandaCurenta.getListaBauturi()[b].getNrIngrediente(); i++) {
             for(int k=0; k<nrIngrediente; k++) {
